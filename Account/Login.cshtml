@@ -3,7 +3,7 @@
 	Page.Title = "Iniciar sesion";
 
 	var email = "";
-	var password = "";
+	var password = "";	
 
 	if(IsPost)
 	{
@@ -18,12 +18,14 @@
 		{
 			//Intento de login con las credenciales proporcionadas
 			if(WebSecurity.Login(email, password, rememberMe)) {
-				if(Request.QueryString["sender"] != null) {
+				if(Request.QueryString["sender"] != null) {					
 					Response.Redirect(Request.QueryString["sender"]);
-				} else {
+				} 
+				else {					
 					Response.Redirect("~/Default");
 				}
-			} else {
+			} 
+			else {
 				Validation.AddFormError("No ha sido posible iniciar sesion.");
 			}
 		}

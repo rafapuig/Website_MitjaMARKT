@@ -291,3 +291,26 @@ input.input-validation-error {
 #accountSummary img {
 	vertical-align: middle;
 }
+
+/* Checkout */
+
+#checkout h2 {
+	width: 30%;
+	border-bottom: 1px dashed #cdcdcd;
+	margin: 25px 0px 20px 0px;
+}
+
+#checkout label {
+	font-weight: bold;
+	padding-right: 5px;
+	width: 10em;
+	float: left;
+}
+
+#checkout p {
+	padding: 5px 0px 5px 0px;
+}
+
+#checkout input[type="submit"] {
+	padding: 5px 45px 5px 45px;
+}

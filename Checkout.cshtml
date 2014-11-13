@@ -1,0 +1,135 @@
+﻿@{
+	if(!WebSecurity.IsAuthenticated) {
+		string currentUrl = Request.Url.ToString(); //.GetComponents(UriComponents.PathAndQuery, UriFormat.Unescaped);
+		Response.Redirect("~/Account/Login?sender=" + currentUrl);
+	}
+
+	Layout = "~/Shared/Layouts/_Layout.cshtml";
+	Page.Title = "Confirmar compra";
+
+	var direccion1 = "";
+	var direccion2 = "";
+	var poblacion = "";
+	var provincia = "";
+	var codigoPostal = "";
+	var pais = "";
+
+	//Redireccionar a la pagina del carrito si no existe uno en la sesion
+	if(Session["cart"] == null) {
+		Response.Redirect("Cart");
+	}
+
+	//Recuperar el carrito actual de la sesion
+	Cart cart = (Cart)Session["cart"];
+
+	//Redireccionar a la pagina del carrito si no tiene items
+	if(cart.Items.Count() == 0)	{
+		Response.Redirect("~/Cart");
+	}
+    
+	//Manejo del reenvio de pagina
+	var userID = 0;
+	if(IsPost)
+	{
+		//Guardar pedido
+		//userID = WebSecurity.GetUserId(WebSecurity.CurrentUserName);
+		userID = WebSecurity.CurrentUserId;
+
+		var db = Database.Open("MitjaMARKT");
+		var pedidoSql = @"INSERT INTO Pedidos (UserId, PedidoEnviado, Total,
+						Fecha, Direccion1, Direccion2, Poblacion, Provincia,
+						CodigoPostal, Pais)
+						VALUES ( @0, @1, @2, @3, @4, @5, @6, @7, @8, @9)";
+
+		db.Execute(pedidoSql, userID, false, cart.TotalValue, DateTime.Now,
+				direccion1, direccion2, poblacion, provincia, codigoPostal, pais);
+
+		var pedidoId = db.GetLastInsertId();
+
+		foreach(var item in cart.Items)
+		{
+			pedidoSql = @"INSERT INTO PedidoItems (PedidoId, ProductoId, Idioma, Precio)
+						VALUES (@0, @1, @2, @3)";
+
+			db.Execute(pedidoSql, pedidoId, item.ProductoID, item.IdiomaManual, item.Precio);
+		}
+
+		//Enviar email de confirmacion
+		/*WebMail.Send(to: WebSecurity.CurrentUserName,
+					subject: "MitjaMarkt Comfirmacion de pedido",
+					body: @"Muchas gracias por tu pedido. 
+					Tu pedido se atendera en breve y deberia llegar en 3-5 dias laborales"
+					);*/
+
+		//Limpiar el carrito
+		cart.Clear();
+
+		Response.Redirect("PedidoCompletado");
+	}
+}
+
+<p>@userID</p>
+
+
+<h1>Confirmar compra</h1>
+<div id="checkout">
+	<h2>Detalles del pedido</h2>
+	<table id="cartTable">
+		<tr>
+			<th class="producto">Producto</th>
+			<th class="idioma">Idioma</th>
+			<th class="precio">Precio</th>
+		</tr>
+
+		@foreach(var item in cart.Items)
+		{
+			<tr>
+				<td class="producto">@Productos.GetNombreProductoFromId(item.ProductoID)</td>
+				<td class="idioma">@item.IdiomaManual</td>
+				<td class="precio">@Formating.Price(item.Precio) €</td>
+			</tr>
+		}
+
+		<tr class="cartTotal">
+			<td colspan="2">&nbsp;</td>
+			<td>Total: @Formating.Price(cart.TotalValue) €</td>			
+		</tr>
+	</table>
+
+	<h2>Detalles de entrega</h2>
+	<form action="Checkout" method="post">
+		<p>
+			@Html.Label("Direccion 1: ", "direccion1")
+			@Html.TextBox("direccion1", direccion1, new { maxlength = "100"})
+			@Html.ValidationMessage("direccion1")
+		</p>
+		<p>
+			@Html.Label("Direccion 2: ", "direccion2")
+			@Html.TextBox("direccion2", direccion2, new { maxlength = "100"})			
+		</p>
+		<p>
+			@Html.Label("Poblacion: ", "poblacion")
+			@Html.TextBox("poblacion", poblacion, new { maxlength = "50"})
+			@Html.ValidationMessage("poblacion")
+		</p>
+		<p>
+			@Html.Label("Provincia: ", "provincia")
+			@Html.TextBox("provincia", provincia, new { maxlength = "50"})
+			@Html.ValidationMessage("provincia")
+		</p>
+		<p>
+			@Html.Label("Codigo Postal: ", "codigoPostal")
+			@Html.TextBox("codigoPostal", codigoPostal, new { maxlength = "20"})
+			@Html.ValidationMessage("codigoPostal")
+		</p>
+		<p>
+			@Html.Label("Pais: ", "pais")
+			@Html.TextBox("pais", pais, new { maxlength = "50"})
+			@Html.ValidationMessage("pais")
+		</p>
+		<h2>Confirmar pedido</h2>
+		<p>
+			<input type="submit" value="Realizar pedido" />
+		</p>
+	</form>
+</div>

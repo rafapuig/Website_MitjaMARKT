@@ -1,0 +1,11 @@
+﻿@* Funciones Productos *@
+
+@functions {
+	
+	public static string GetNombreProductoFromId(int productoID)
+	{
+		var db = Database.Open("MitjaMARKT");
+		var sqlQuery = "SELECT Titulo FROM Productos WHERE productoID = @0";
+		return db.QuerySingle(sqlQuery, productoID).Titulo;
+	}    
+}

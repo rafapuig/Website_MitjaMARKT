@@ -1,0 +1,82 @@
+﻿@{
+	Layout = "~/Shared/Layouts/_Layout.cshtml";
+	Page.Title = "Carrito";
+
+	//Crear un carrito vacio en la sesion si no existe todavia niguno
+	if(Session["cart"] == null)
+	{
+		Session["cart"] = new Cart();
+	}
+
+	//Obtener el carrito actual de la sesion
+	Cart cart = (Cart)Session["cart"];
+	
+	if(IsPost)    
+	{
+		if(Request["productoID"] != null)
+		{
+			var productoID = Request["productoID"];
+			var idioma = Request["idioma"];
+			var precio = Request["precio"];
+
+			cart.AddItem(productoID.AsInt(), idioma, precio.AsDecimal());
+		}
+		else if(Request["Remove"] != null)
+		{
+			var removeIndex = Request["removeIndex"].AsInt();
+			cart.RemoveItem(removeIndex);
+		}
+	}
+}
+
+<h1>Carrito de compra</h1>
+
+@if(cart.Items.Count() == 0)
+{
+	<p>No hay items en tu carrito de la compra.</p>
+}
+else
+{
+	<table id="cartTable">
+		<tr>
+			<th class="producto">Articulo</th>
+			<th class="idioma">Idioma</th>
+			<th class="precio">Precio</th>
+			<th>&nbsp;</th>
+		</tr>
+
+		@{
+			//Declarar e inicializar la variable indice i
+			int i = 0;
+		}
+
+		@foreach(var item in cart.Items)
+		{
+			<tr>
+				<td class="producto">@Productos.GetNombreProductoFromId(item.ProductoID)</td>
+				<td class="idioma">@item.IdiomaManual</td>
+				<td class="precio">@Formating.Price(item.Precio) €</td>
+				<td class="remove">
+					<form action="Cart" method="post">
+						@Html.Hidden("removeIdex", i)
+						<input type="submit" name="Remove" value="Eliminar" />
+					</form>
+				</td>
+			</tr>
+			
+			//Incrementar la variable indice
+			i++;
+		}
+
+		<tr class="cartTotal">
+			<td colspan="2">&nbsp;</td>
+			<td>Total: @Formating.Price(cart.TotalValue) €</td>
+			<td>&nbsp;</td>
+		</tr>
+	</table>
+	<div id="cartButtons">
+		<a href="~/Default" class="linkButton">Continuar Comprando</a>
+		<a href="~/Checkout" class="linkButton">Confirmar Compra</a>	
+	</div>
+}
+

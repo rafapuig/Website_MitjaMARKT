@@ -45,11 +45,11 @@
 																@item.Email
 															</a>
 														</text>),
-								pedidosGrid.Column("PedidoEnviado", "Enviado",
+								pedidosGrid.Column("PedidoEnviado", "Enviado", style: "centerTextColumn",
 												format:@<text>
 															@(item.PedidoEnviado ? "Si":"No")
 														</text>),
-								pedidosGrid.Column("Total", "Valor Total",
+								pedidosGrid.Column("Total", "Valor Total", style: "rightTextColumn",
 												format:@<text>@item.Total.ToString("N2") €</text>),
 								pedidosGrid.Column("Fecha", "Fecha Pedido"),
 								pedidosGrid.Column(format:

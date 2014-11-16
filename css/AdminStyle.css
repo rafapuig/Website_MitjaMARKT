@@ -68,6 +68,16 @@ textarea {
 	width: 100%;
 }
 
+.grid .rightTextColumn
+{
+	text-align: right;
+}
+
+.grid .centerTextColumn
+{
+	text-align: center;
+}
+
 
 /* Forms */
 

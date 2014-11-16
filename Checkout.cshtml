@@ -35,6 +35,13 @@
 		//userID = WebSecurity.GetUserId(WebSecurity.CurrentUserName);
 		userID = WebSecurity.CurrentUserId;
 
+		direccion1 = Request["direccion1"];
+		direccion2 = Request["direccion2"];
+		poblacion = Request["poblacion"];
+		provincia = Request["provincia"];
+		codigoPostal = Request["codigoPostal"];
+		pais = Request["pais"];
+
 		var db = Database.Open("MitjaMARKT");
 		var pedidoSql = @"INSERT INTO Pedidos (UserId, PedidoEnviado, Total,
 						Fecha, Direccion1, Direccion2, Poblacion, Provincia,
